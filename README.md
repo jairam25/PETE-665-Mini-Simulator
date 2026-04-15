@@ -1,5 +1,20 @@
-# PETE 665 Mini Simulator
+<div align="center">
+<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+</div>
 
-Individual Project – Spring 2026
+# Run and deploy your AI Studio app
 
-Mini simulator using PR EOS (1978) to compute saturation pressure, CCE, and DL for a black oil system.
+This contains everything you need to run your app locally.
+
+View your app in AI Studio: https://ai.studio/apps/7f5f9adf-b933-4c74-9714-e8f9c453c363
+
+## Run Locally
+
+**Prerequisites:**  Node.js
+
+
+1. Install dependencies:
+   `npm install`
+2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
+3. Run the app:
+   `npm run dev`
