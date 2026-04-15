@@ -1,0 +1,6 @@
+{
+  "name": "PETE 665 Mini Simulator",
+  "description": "A mini simulator for petroleum reservoir fluids using Peng-Robinson Equation of State (1978) to simulate saturation pressure, CCE, and DL tests.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
