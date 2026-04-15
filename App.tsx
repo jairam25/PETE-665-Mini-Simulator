@@ -19,9 +19,9 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import pptxgen from "pptxgenjs";
 import * as XLSX from 'xlsx';
-import { cn } from './lib/utils';
-import { MiniSimulator, SimulationResult } from './lib/simulator';
-import { Component } from './lib/eos';
+import { cn } from './utils';
+import { MiniSimulator, SimulationResult } from './simulator';
+import { Component } from './eos';
 
 const INITIAL_COMPOSITION: Component[] = [
   { name: 'Methane', zi: 0.19962, Tc: 343.0, Pc: 666.4, omega: 0.01142, MW: 16.043 },
