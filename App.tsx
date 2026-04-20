@@ -44,16 +44,16 @@ export default function App() {
         const calculatedPsat = sim.calculatePsat();
         setPsat(calculatedPsat);
 
-        // CCE Pressures: Full range to show two-phase behavior
+        // CCE Pressures: Task (2) requires 1000, 1250, 1500 psia
         const ccePressures = [
-          2000, 1750, 1500, 1250, 1000, 
-          calculatedPsat, 
-          700, 600, 500, 400, 300, 200, 100
-        ].filter(p => p > 0).sort((a, b) => b - a);
+          2000, 1500, 1250, 1000, 
+          calculatedPsat
+        ].filter(p => !!p && p > 0).sort((a, b) => b - a);
+        
         const cce = sim.simulateCCE(ccePressures);
         setCceResults(cce);
 
-        // DL Pressures: Psat down to 100
+        // DL Pressures: Task (3) requires 500, 300, 100 psia
         const dlPressures = [calculatedPsat, 500, 300, 100].sort((a, b) => b - a);
         const dl = sim.simulateDL(dlPressures);
         setDlResults(dl);
@@ -212,179 +212,199 @@ export default function App() {
           {/* Main Content - Charts */}
           <main className="p-6 bg-bg-deep overflow-y-auto space-y-6">
             {cceResults.length > 0 ? (
-              <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 h-full overflow-y-auto pr-2 custom-scrollbar">
-                <div className="bg-bg-surface border border-border-theme rounded-lg flex flex-col h-[300px]">
-                  <div className="p-4 border-b border-border-theme flex justify-between items-center">
-                    <span className="text-xs font-bold uppercase tracking-wider text-text-secondary">CCE: Relative Volume</span>
-                    <span className="text-[10px] text-accent-theme font-mono">V/Vsat</span>
+              <div className="flex flex-col gap-6 h-full overflow-y-auto pr-2 custom-scrollbar pb-12">
+                
+                {/* REQUIRED PROJECT DATA SECTION */}
+                <div className="bg-bg-surface border border-accent-theme/30 rounded-xl overflow-hidden shadow-lg shadow-accent-theme/5">
+                  <div className="bg-accent-theme/10 px-6 py-4 border-b border-accent-theme/30 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-accent-theme rounded-lg text-bg-deep">
+                        <Info className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <h2 className="text-sm font-bold text-accent-theme uppercase tracking-wider">Required Project Results (CCE)</h2>
+                        <p className="text-[10px] text-text-secondary mt-0.5">Calculated values for 1500, 1250, and 1000 psia as per PETE665 requirements.</p>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex-1 p-4">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={cceResults}>
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#222" />
-                        <XAxis 
-                          dataKey="pressure" 
-                          type="number" 
-                          domain={['auto', 'auto']} 
-                          reversed
-                          stroke="#444"
-                          tick={{ fill: '#666', fontSize: 10 }}
-                        />
-                        <YAxis 
-                          stroke="#444" 
-                          tick={{ fill: '#666', fontSize: 10 }} 
-                          domain={[0, 2]}
-                          allowDataOverflow={true}
-                        />
-                        <Tooltip 
-                          contentStyle={{ backgroundColor: '#1F2227', border: '1px solid #2D3139', borderRadius: '4px', fontSize: '12px' }}
-                          itemStyle={{ color: '#00D1FF' }}
-                        />
-                        <Line type="monotone" dataKey="relativeVolume" stroke="#00D1FF" strokeWidth={2} dot={{ r: 3, fill: '#00D1FF' }} />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  </div>
-                </div>
-
-                <div className="bg-bg-surface border border-border-theme rounded-lg flex flex-col h-[300px]">
-                  <div className="p-4 border-b border-border-theme flex justify-between items-center">
-                    <span className="text-xs font-bold uppercase tracking-wider text-text-secondary">DL: Black Oil Properties</span>
-                    <span className="text-[10px] text-accent-theme font-mono">Bo & Bt</span>
-                  </div>
-                  <div className="flex-1 p-4">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={dlResults}>
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#222" />
-                        <XAxis 
-                          dataKey="pressure" 
-                          type="number" 
-                          domain={['auto', 'auto']} 
-                          reversed
-                          stroke="#444"
-                          tick={{ fill: '#666', fontSize: 10 }}
-                        />
-                        <YAxis stroke="#444" tick={{ fill: '#666', fontSize: 10 }} />
-                        <Tooltip 
-                          contentStyle={{ backgroundColor: '#1F2227', border: '1px solid #2D3139', borderRadius: '4px', fontSize: '12px' }}
-                        />
-                        <Legend iconType="circle" wrapperStyle={{ fontSize: '10px', paddingTop: '10px' }} />
-                        <Line name="Bo" type="monotone" dataKey="Bo" stroke="#00D1FF" strokeWidth={2} dot={{ r: 3 }} />
-                        <Line name="Bt" type="monotone" dataKey="BtD" stroke="#EF4444" strokeWidth={2} dot={{ r: 3 }} />
-                      </LineChart>
-                    </ResponsiveContainer>
+                  <div className="p-0">
+                    <table className="w-full text-left border-collapse">
+                      <thead>
+                        <tr className="bg-bg-control/50">
+                          <th className="px-6 py-3 text-[10px] font-bold text-text-secondary uppercase tracking-widest border-b border-border-theme">Pressure (psia)</th>
+                          <th className="px-6 py-3 text-[10px] font-bold text-text-secondary uppercase tracking-widest border-b border-border-theme text-center">Rel. Volume (V/Vsat)</th>
+                          <th className="px-6 py-3 text-[10px] font-bold text-text-secondary uppercase tracking-widest border-b border-border-theme text-center">Oil Density (ρo)</th>
+                          <th className="px-6 py-3 text-[10px] font-bold text-text-secondary uppercase tracking-widest border-b border-border-theme text-center">Gas Density (ρg)</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {cceResults.filter(r => [1500, 1250, 1000].includes(Math.round(r.pressure))).map((row) => (
+                          <tr key={row.pressure} className="hover:bg-bg-control/30 transition-colors">
+                            <td className="px-6 py-4 text-sm font-mono text-accent-theme border-b border-border-theme">{row.pressure.toFixed(1)}</td>
+                            <td className="px-6 py-4 text-sm font-mono text-text-primary border-b border-border-theme text-center">{row.relativeVolume?.toFixed(4)}</td>
+                            <td className="px-6 py-4 text-sm font-mono text-text-primary border-b border-border-theme text-center">{row.rhoO?.toFixed(3)} lb/ft³</td>
+                            <td className="px-6 py-4 text-sm font-mono text-text-secondary border-b border-border-theme text-center">{row.rhoG && row.rhoG > 0 ? `${row.rhoG.toFixed(3)} lb/ft³` : 'N/A'}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
                 </div>
 
-                <div className="bg-bg-surface border border-border-theme rounded-lg flex flex-col h-[300px]">
-                  <div className="p-4 border-b border-border-theme flex justify-between items-center">
-                    <span className="text-xs font-bold uppercase tracking-wider text-text-secondary">CCE: Oil Density</span>
-                    <span className="text-[10px] text-accent-theme font-mono">lb/ft³</span>
+                {/* REQUIRED PROJECT DATA SECTION (DL) */}
+                <div className="bg-bg-surface border border-accent-theme/30 rounded-xl overflow-hidden shadow-lg shadow-accent-theme/5">
+                  <div className="bg-accent-theme/10 px-6 py-4 border-b border-accent-theme/30 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-accent-theme rounded-lg text-bg-deep">
+                        <TrendingUp className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <h2 className="text-sm font-bold text-accent-theme uppercase tracking-wider">Required Project Results (DL)</h2>
+                        <p className="text-[10px] text-text-secondary mt-0.5">Calculated values for 500, 300, and 100 psia as per PETE665 requirements.</p>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex-1 p-4">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={cceResults}>
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#222" />
-                        <XAxis 
-                          dataKey="pressure" 
-                          type="number" 
-                          domain={['auto', 'auto']} 
-                          reversed
-                          stroke="#444"
-                          tick={{ fill: '#666', fontSize: 10 }}
-                        />
-                        <YAxis stroke="#444" tick={{ fill: '#666', fontSize: 10 }} domain={['auto', 'auto']} />
-                        <Tooltip 
-                          contentStyle={{ backgroundColor: '#1F2227', border: '1px solid #2D3139', borderRadius: '4px', fontSize: '12px' }}
-                          itemStyle={{ color: '#10B981' }}
-                        />
-                        <Line name="Oil Density" type="monotone" dataKey="rhoO" stroke="#10B981" strokeWidth={2} dot={{ r: 3 }} />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  </div>
-                </div>
-
-                <div className="bg-bg-surface border border-border-theme rounded-lg flex flex-col h-[300px]">
-                  <div className="p-4 border-b border-border-theme flex justify-between items-center">
-                    <span className="text-xs font-bold uppercase tracking-wider text-text-secondary">CCE: Gas Density</span>
-                    <span className="text-[10px] text-accent-theme font-mono">lb/ft³</span>
-                  </div>
-                  <div className="flex-1 p-4">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={cceResults.filter(r => r.rhoG > 0)}>
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#222" />
-                        <XAxis 
-                          dataKey="pressure" 
-                          type="number" 
-                          domain={['auto', 'auto']} 
-                          reversed
-                          stroke="#444"
-                          tick={{ fill: '#666', fontSize: 10 }}
-                        />
-                        <YAxis stroke="#444" tick={{ fill: '#666', fontSize: 10 }} domain={['auto', 'auto']} />
-                        <Tooltip 
-                          contentStyle={{ backgroundColor: '#1F2227', border: '1px solid #2D3139', borderRadius: '4px', fontSize: '12px' }}
-                          itemStyle={{ color: '#F59E0B' }}
-                        />
-                        <Line name="Gas Density" type="monotone" dataKey="rhoG" stroke="#F59E0B" strokeWidth={2} dot={{ r: 3 }} />
-                      </LineChart>
-                    </ResponsiveContainer>
+                  <div className="p-0 overflow-x-auto">
+                    <table className="w-full text-left border-collapse min-w-[600px]">
+                      <thead>
+                        <tr className="bg-bg-control/50">
+                          <th className="px-6 py-3 text-[10px] font-bold text-text-secondary uppercase tracking-widest border-b border-border-theme">Pressure (p)</th>
+                          <th className="px-6 py-3 text-[10px] font-bold text-text-secondary uppercase tracking-widest border-b border-border-theme text-center">Bo (bbl/STB)</th>
+                          <th className="px-6 py-3 text-[10px] font-bold text-text-secondary uppercase tracking-widest border-b border-border-theme text-center">Bg (bbl/scf)</th>
+                          <th className="px-6 py-3 text-[10px] font-bold text-text-secondary uppercase tracking-widest border-b border-border-theme text-center">RsD (scf/STB)</th>
+                          <th className="px-6 py-3 text-[10px] font-bold text-text-secondary uppercase tracking-widest border-b border-border-theme text-center">RsDb (scf/STB)</th>
+                          <th className="px-6 py-3 text-[10px] font-bold text-text-secondary uppercase tracking-widest border-b border-border-theme text-center">BtD (bbl/STB)</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {dlResults.filter(r => [500, 300, 100].includes(Math.round(r.pressure))).map((row) => (
+                          <tr key={row.pressure} className="hover:bg-bg-control/30 transition-colors">
+                            <td className="px-6 py-4 text-sm font-mono text-accent-theme border-b border-border-theme">{row.pressure.toFixed(1)}</td>
+                            <td className="px-6 py-4 text-sm font-mono text-text-primary border-b border-border-theme text-center">{row.Bo?.toFixed(4)}</td>
+                            <td className="px-6 py-4 text-sm font-mono text-text-primary border-b border-border-theme text-center">{row.Bg?.toFixed(6)}</td>
+                            <td className="px-6 py-4 text-sm font-mono text-text-primary border-b border-border-theme text-center">{row.RsD?.toFixed(1)}</td>
+                            <td className="px-6 py-4 text-sm font-mono text-text-primary border-b border-border-theme text-center">{row.RsDb?.toFixed(1)}</td>
+                            <td className="px-6 py-4 text-sm font-mono text-text-primary border-b border-border-theme text-center">{row.BtD?.toFixed(4)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
                 </div>
 
-                <div className="bg-bg-surface border border-border-theme rounded-lg flex flex-col h-[300px]">
-                  <div className="p-4 border-b border-border-theme flex justify-between items-center">
-                    <span className="text-xs font-bold uppercase tracking-wider text-text-secondary">DL: Gas Evolution</span>
-                    <span className="text-[10px] text-accent-theme font-mono">RsD & RsDb</span>
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                  <div className="bg-bg-surface border border-border-theme rounded-lg flex flex-col h-[400px] xl:col-span-2">
+                    <div className="p-4 border-b border-border-theme flex justify-between items-center">
+                      <div className="flex flex-col">
+                        <span className="text-xs font-bold uppercase tracking-wider text-text-secondary">CCE: Phase Behavior Data</span>
+                        <span className="text-[10px] text-text-secondary/60">Relative Volume, ρo, and ρg</span>
+                      </div>
+                      <div className="flex gap-4">
+                        <div className="flex items-center gap-1.5">
+                          <div className="w-2 h-2 rounded-full bg-[#00D1FF]" />
+                          <span className="text-[10px] text-text-secondary uppercase">V/Vsat</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <div className="w-2 h-2 rounded-full bg-[#10B981]" />
+                          <span className="text-[10px] text-text-secondary uppercase">ρo (Oil)</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <div className="w-2 h-2 rounded-full bg-[#F59E0B]" />
+                          <span className="text-[10px] text-text-secondary uppercase">ρg (Gas)</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex-1 p-4">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <LineChart data={cceResults}>
+                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#222" />
+                          <XAxis 
+                            dataKey="pressure" 
+                            type="number" 
+                            domain={['auto', 'auto']} 
+                            reversed
+                            stroke="#444"
+                            tick={{ fill: '#666', fontSize: 10 }}
+                            label={{ value: 'Pressure (psia)', position: 'insideBottom', offset: -5, fill: '#666', fontSize: 10 }}
+                          />
+                          <YAxis 
+                            yAxisId="left"
+                            stroke="#444" 
+                            tick={{ fill: '#666', fontSize: 10 }} 
+                            domain={[0, 'auto']}
+                          />
+                          <YAxis 
+                            yAxisId="right" 
+                            orientation="right"
+                            stroke="#444" 
+                            tick={{ fill: '#666', fontSize: 10 }} 
+                            domain={[0, 'auto']}
+                          />
+                          <Tooltip 
+                            contentStyle={{ backgroundColor: '#1F2227', border: '1px solid #2D3139', borderRadius: '4px', fontSize: '11px' }}
+                          />
+                          <Line yAxisId="left" name="Relative Volume" type="monotone" dataKey="relativeVolume" stroke="#00D1FF" strokeWidth={2} dot={{ r: 4 }} activeDot={{ r: 6 }} />
+                          <Line yAxisId="right" name="Oil Density (ρo)" type="monotone" dataKey="rhoO" stroke="#10B981" strokeWidth={2} dot={{ r: 4 }} />
+                          <Line yAxisId="right" name="Gas Density (ρg)" type="monotone" dataKey="rhoG" stroke="#F59E0B" strokeWidth={2} dot={{ r: 4 }} connectNulls />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </div>
                   </div>
-                  <div className="flex-1 p-4">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={dlResults}>
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#222" />
-                        <XAxis 
-                          dataKey="pressure" 
-                          type="number" 
-                          domain={['auto', 'auto']} 
-                          reversed
-                          stroke="#444"
-                          tick={{ fill: '#666', fontSize: 10 }}
-                        />
-                        <YAxis stroke="#444" tick={{ fill: '#666', fontSize: 10 }} />
-                        <Tooltip 
-                          contentStyle={{ backgroundColor: '#1F2227', border: '1px solid #2D3139', borderRadius: '4px', fontSize: '12px' }}
-                        />
-                        <Legend iconType="circle" wrapperStyle={{ fontSize: '10px', paddingTop: '10px' }} />
-                        <Line name="RsD (Solution)" type="monotone" dataKey="RsD" stroke="#10B981" strokeWidth={2} dot={{ r: 3 }} />
-                        <Line name="RsDb (Released)" type="monotone" dataKey="RsDb" stroke="#F59E0B" strokeWidth={2} dot={{ r: 3 }} />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  </div>
-                </div>
 
-                <div className="bg-bg-surface border border-border-theme rounded-lg flex flex-col h-[300px]">
-                  <div className="p-4 border-b border-border-theme flex justify-between items-center">
-                    <span className="text-xs font-bold uppercase tracking-wider text-text-secondary">DL: Gas FVF</span>
-                    <span className="text-[10px] text-accent-theme font-mono">Bg (bbl/scf)</span>
+                  {/* DL: VOLUME PROPERTIES */}
+                  <div className="bg-bg-surface border border-border-theme rounded-xl flex flex-col h-[380px] overflow-hidden">
+                    <div className="p-4 border-b border-border-theme bg-bg-control/20">
+                      <span className="text-xs font-bold uppercase tracking-wider text-text-secondary">DL: Formation Volume Factors</span>
+                    </div>
+                    <div className="flex-1 p-4">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <LineChart data={dlResults}>
+                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#222" />
+                          <XAxis 
+                            dataKey="pressure" 
+                            type="number" 
+                            domain={['auto', 'auto']} 
+                            reversed
+                            stroke="#444"
+                            tick={{ fill: '#666', fontSize: 10 }}
+                          />
+                          <YAxis stroke="#444" tick={{ fill: '#666', fontSize: 10 }} />
+                          <Tooltip contentStyle={{ backgroundColor: '#1F2227', border: '1px solid #2D3139', borderRadius: '4px', fontSize: '11px' }} />
+                          <Legend wrapperStyle={{ fontSize: '10px' }} />
+                          <Line name="Oil FVF (Bo)" type="monotone" dataKey="Bo" stroke="#00D1FF" strokeWidth={2} dot={{ r: 4 }} />
+                          <Line name="Total FVF (BtD)" type="monotone" dataKey="BtD" stroke="#EF4444" strokeWidth={2} dot={{ r: 4 }} />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </div>
                   </div>
-                  <div className="flex-1 p-4">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={dlResults}>
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#222" />
-                        <XAxis 
-                          dataKey="pressure" 
-                          type="number" 
-                          domain={['auto', 'auto']} 
-                          reversed
-                          stroke="#444"
-                          tick={{ fill: '#666', fontSize: 10 }}
-                        />
-                        <YAxis stroke="#444" tick={{ fill: '#666', fontSize: 10 }} domain={['auto', 'auto']} />
-                        <Tooltip 
-                          contentStyle={{ backgroundColor: '#1F2227', border: '1px solid #2D3139', borderRadius: '4px', fontSize: '12px' }}
-                          itemStyle={{ color: '#8B5CF6' }}
-                        />
-                        <Line name="Bg" type="monotone" dataKey="Bg" stroke="#8B5CF6" strokeWidth={2} dot={{ r: 3 }} />
-                      </LineChart>
-                    </ResponsiveContainer>
+
+                  {/* DL: GAS PROPERTIES */}
+                  <div className="bg-bg-surface border border-border-theme rounded-xl flex flex-col h-[380px] overflow-hidden">
+                    <div className="p-4 border-b border-border-theme bg-bg-control/20">
+                      <span className="text-xs font-bold uppercase tracking-wider text-text-secondary">DL: Gas Liberation & Evolution</span>
+                    </div>
+                    <div className="flex-1 p-4">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <LineChart data={dlResults}>
+                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#222" />
+                          <XAxis 
+                            dataKey="pressure" 
+                            type="number" 
+                            domain={['auto', 'auto']} 
+                            reversed
+                            stroke="#444"
+                            tick={{ fill: '#666', fontSize: 10 }}
+                          />
+                          <YAxis yAxisId="left" stroke="#10B981" tick={{ fill: '#10B981', fontSize: 10 }} />
+                          <YAxis yAxisId="right" orientation="right" stroke="#8B5CF6" tick={{ fill: '#8B5CF6', fontSize: 10 }} />
+                          <Tooltip contentStyle={{ backgroundColor: '#1F2227', border: '1px solid #2D3139', borderRadius: '4px', fontSize: '11px' }} />
+                          <Legend wrapperStyle={{ fontSize: '10px' }} />
+                          <Line yAxisId="left" name="Solution GOR (RsD)" type="monotone" dataKey="RsD" stroke="#10B981" strokeWidth={2} dot={{ r: 4 }} />
+                          <Line yAxisId="left" name="Released Gas (RsDb)" type="monotone" dataKey="RsDb" stroke="#F59E0B" strokeWidth={2} dot={{ r: 4 }} />
+                          <Line yAxisId="right" name="Gas FVF (Bg)" type="monotone" dataKey="Bg" stroke="#8B5CF6" strokeWidth={2} dot={{ r: 4 }} />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </div>
                   </div>
                 </div>
               </div>
