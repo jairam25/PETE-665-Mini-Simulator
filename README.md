@@ -1,24 +1,20 @@
-# PETE 665 Mini Simulator
+<div align="center">
+<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+</div>
 
-PR EOS (1978) Mini Simulator for Black Oil Phase Behavior
+# Run and deploy your AI Studio app
 
-**Spring 2026 — Individual Project**
+This contains everything you need to run your app locally.
 
-## Features
-- Saturation (Bubble Point) pressure calculation
-- Constant Composition Expansion (CCE) simulation
-- Differential Liberation (DL) simulation
-- Interactive plots for Vrel, ρo, ρg, Bo, BtD, Bg, RsD, RsDb
+View your app in AI Studio: https://ai.studio/apps/7f5f9adf-b933-4c74-9714-e8f9c453c363
 
-## Live Demo
-[pete-665-mini-simulator.vercel.app](https://pete-665-mini-simulator.vercel.app)
+## Run Locally
 
-## Equations & References
-- Peng-Robinson EOS (1978) with κ = 0.379642 + 1.48503ω − 0.1644ω² + 0.016667ω³
-- Pedersen et al., Phase Behavior of Petroleum Reservoir Fluids, Ch. 4
-- Peng & Robinson, AIChE Journal, Vol. 23, No. 2, 1977
+**Prerequisites:**  Node.js
 
-## Tech Stack
-- TypeScript
-- Vite
-- Vercel
+
+1. Install dependencies:
+   `npm install`
+2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
+3. Run the app:
+   `npm run dev`
