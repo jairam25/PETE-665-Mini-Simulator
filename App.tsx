@@ -387,12 +387,12 @@ export default function App() {
                             stroke="#444"
                             tick={{ fill: '#666', fontSize: 10 }}
                           />
-                          <YAxis yAxisId="left" stroke="#10B981" tick={{ fill: '#10B981', fontSize: 10 }} />
-                          <YAxis yAxisId="right" orientation="right" stroke="#8B5CF6" tick={{ fill: '#8B5CF6', fontSize: 10 }} />
+                          <YAxis yAxisId="left" stroke="#444" tick={{ fill: '#666', fontSize: 10 }} />
+                          <YAxis yAxisId="right" orientation="right" stroke="#444" tick={{ fill: '#666', fontSize: 10 }} />
                           <Tooltip contentStyle={{ backgroundColor: '#1F2227', border: '1px solid #2D3139', borderRadius: '4px', fontSize: '11px' }} />
                           <Legend wrapperStyle={{ fontSize: '10px' }} />
                           <Line yAxisId="left" name="Solution GOR (RsD)" type="monotone" dataKey="RsD" stroke="#10B981" strokeWidth={2} dot={{ r: 4 }} />
-                          <Line yAxisId="left" name="Bubble Point GOR (RsDb)" type="monotone" dataKey="RsDb" stroke="#EF4444" strokeWidth={2} dot={{ r: 0 }} strokeDasharray="5 5" />
+                          <Line yAxisId="left" name="Cum. Released Gas (RsDb)" type="monotone" dataKey="RsDb" stroke="#EF4444" strokeWidth={2} dot={{ r: 4 }} />
                           <Line yAxisId="right" name="Gas FVF (Bg)" type="monotone" dataKey="Bg" stroke="#8B5CF6" strokeWidth={2} dot={{ r: 4 }} />
                         </LineChart>
                       </ResponsiveContainer>
