@@ -20,11 +20,11 @@ import { MiniSimulator, SimulationResult } from './simulator';
 import { Component } from './eos';
 
 const INITIAL_COMPOSITION: Component[] = [
-  { name: 'Methane', zi: 0.19962, Tc: 343.0, Pc: 666.4, omega: 0.01142, MW: 16.043 },
-  { name: 'Ethane', zi: 0.10010, Tc: 549.76, Pc: 706.5, omega: 0.0995, MW: 30.070 },
-  { name: 'Propane', zi: 0.18579, Tc: 665.68, Pc: 616.0, omega: 0.1523, MW: 44.097 },
+  { name: 'Methane', zi: 0.19962, Tc: 343, Pc: 666.4, omega: 0.01142, MW: 16.043 },
+  { name: 'Ethane', zi: 0.1001, Tc: 549.76, Pc: 706.5, omega: 0.0995, MW: 30.07 },
+  { name: 'Propane', zi: 0.18579, Tc: 665.68, Pc: 616, omega: 0.1523, MW: 44.097 },
   { name: 'n-Butane', zi: 0.09036, Tc: 765.29, Pc: 550.6, omega: 0.2002, MW: 58.124 },
-  { name: 'n-Pentane', zi: 0.18851, Tc: 845.37, Pc: 488.78, omega: 0.2515, MW: 72.150 },
+  { name: 'n-Pentane', zi: 0.18851, Tc: 845.37, Pc: 488.78, omega: 0.2515, MW: 72.15 },
   { name: 'PSEUDO+', zi: 0.23563, Tc: 913.32, Pc: 436.293, omega: 0.296, MW: 86.177 },
 ];
 
@@ -44,16 +44,12 @@ export default function App() {
         const calculatedPsat = sim.calculatePsat();
         setPsat(calculatedPsat);
 
-        // CCE Pressures: Task (2) requires 1000, 1250, 1500 psia
-        const ccePressures = [
-          2000, 1500, 1250, 1000, 
-          calculatedPsat
-        ].filter(p => !!p && p > 0).sort((a, b) => b - a);
-        
+        // CCE Pressures: Task (2) strictly requires 1500, 1250, 1000 psia and Pb
+        const ccePressures = [1500, 1250, 1000, calculatedPsat].sort((a, b) => b - a);
         const cce = sim.simulateCCE(ccePressures);
         setCceResults(cce);
 
-        // DL Pressures: Task (3) requires 500, 300, 100 psia
+        // DL Pressures: Task (3) strictly requires Pb, 500, 300, 100 psia
         const dlPressures = [calculatedPsat, 500, 300, 100].sort((a, b) => b - a);
         const dl = sim.simulateDL(dlPressures);
         setDlResults(dl);
@@ -146,7 +142,7 @@ export default function App() {
         </div>
       </header>
 
-      <div className="flex-1 overflow-hidden grid grid-rows-[1fr_200px] grid-cols-[280px_1fr]">
+      <div className="flex-1 overflow-hidden grid grid-rows-[1fr_130px] grid-cols-[280px_1fr]">
           {/* Sidebar - Inputs */}
           <aside className="bg-bg-surface border-r border-border-theme p-6 flex flex-col gap-5 overflow-y-auto">
             <div className="space-y-4">
@@ -210,20 +206,20 @@ export default function App() {
           </aside>
 
           {/* Main Content - Charts */}
-          <main className="p-6 bg-bg-deep overflow-y-auto space-y-6">
-            {cceResults.length > 0 ? (
-              <div className="flex flex-col gap-6 h-full overflow-y-auto pr-2 custom-scrollbar pb-12">
+          <main className="p-6 bg-bg-deep overflow-y-auto">
+            <div className="max-w-[1400px] mx-auto w-full space-y-8">
+              {cceResults.length > 0 ? (
+                <div className="flex flex-col gap-8 pb-12">
                 
-                {/* REQUIRED PROJECT DATA SECTION */}
-                <div className="bg-bg-surface border border-accent-theme/30 rounded-xl overflow-hidden shadow-lg shadow-accent-theme/5">
+                {/* TABLES SECTION - Adaptive Grid */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* REQUIRED PROJECT DATA SECTION (CCE) */}
+                  <div className="bg-bg-surface border border-accent-theme/30 rounded-xl overflow-hidden shadow-lg shadow-accent-theme/5">
                   <div className="bg-accent-theme/10 px-6 py-4 border-b border-accent-theme/30 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="p-2 bg-accent-theme rounded-lg text-bg-deep">
-                        <Info className="w-4 h-4" />
-                      </div>
                       <div>
                         <h2 className="text-sm font-bold text-accent-theme uppercase tracking-wider">Required Project Results (CCE)</h2>
-                        <p className="text-[10px] text-text-secondary mt-0.5">Calculated values for 1500, 1250, and 1000 psia as per PETE665 requirements.</p>
+                        <p className="text-[10px] text-text-secondary mt-0.5">Calculated values for 1500, 1250, 1000, and 764.86 (Pb) psia.</p>
                       </div>
                     </div>
                   </div>
@@ -234,16 +230,14 @@ export default function App() {
                           <th className="px-6 py-3 text-[10px] font-bold text-text-secondary uppercase tracking-widest border-b border-border-theme">Pressure (psia)</th>
                           <th className="px-6 py-3 text-[10px] font-bold text-text-secondary uppercase tracking-widest border-b border-border-theme text-center">Rel. Volume (V/Vsat)</th>
                           <th className="px-6 py-3 text-[10px] font-bold text-text-secondary uppercase tracking-widest border-b border-border-theme text-center">Oil Density (ρo)</th>
-                          <th className="px-6 py-3 text-[10px] font-bold text-text-secondary uppercase tracking-widest border-b border-border-theme text-center">Gas Density (ρg)</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {cceResults.filter(r => [1500, 1250, 1000].includes(Math.round(r.pressure))).map((row) => (
+                        {cceResults.filter(r => [1500, 1250, 1000, Math.round(psat || 0)].includes(Math.round(r.pressure))).map((row) => (
                           <tr key={row.pressure} className="hover:bg-bg-control/30 transition-colors">
-                            <td className="px-6 py-4 text-sm font-mono text-accent-theme border-b border-border-theme">{row.pressure.toFixed(1)}</td>
+                            <td className="px-6 py-4 text-sm font-mono text-accent-theme border-b border-border-theme">{row.pressure.toFixed(2)}</td>
                             <td className="px-6 py-4 text-sm font-mono text-text-primary border-b border-border-theme text-center">{row.relativeVolume?.toFixed(4)}</td>
                             <td className="px-6 py-4 text-sm font-mono text-text-primary border-b border-border-theme text-center">{row.rhoO?.toFixed(3)} lb/ft³</td>
-                            <td className="px-6 py-4 text-sm font-mono text-text-secondary border-b border-border-theme text-center">{row.rhoG && row.rhoG > 0 ? `${row.rhoG.toFixed(3)} lb/ft³` : 'N/A'}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -255,44 +249,44 @@ export default function App() {
                 <div className="bg-bg-surface border border-accent-theme/30 rounded-xl overflow-hidden shadow-lg shadow-accent-theme/5">
                   <div className="bg-accent-theme/10 px-6 py-4 border-b border-accent-theme/30 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="p-2 bg-accent-theme rounded-lg text-bg-deep">
-                        <TrendingUp className="w-4 h-4" />
-                      </div>
                       <div>
                         <h2 className="text-sm font-bold text-accent-theme uppercase tracking-wider">Required Project Results (DL)</h2>
-                        <p className="text-[10px] text-text-secondary mt-0.5">Calculated values for 500, 300, and 100 psia as per PETE665 requirements.</p>
+                        <p className="text-[10px] text-text-secondary mt-0.5">Calculated values for Pb, 500, 300, and 100 psia as per PETE665 requirements.</p>
                       </div>
                     </div>
                   </div>
                   <div className="p-0 overflow-x-auto">
-                    <table className="w-full text-left border-collapse min-w-[600px]">
+                    <table className="w-full text-left border-collapse min-w-[700px]">
                       <thead>
                         <tr className="bg-bg-control/50">
-                          <th className="px-6 py-3 text-[10px] font-bold text-text-secondary uppercase tracking-widest border-b border-border-theme">Pressure (p)</th>
-                          <th className="px-6 py-3 text-[10px] font-bold text-text-secondary uppercase tracking-widest border-b border-border-theme text-center">Bo (bbl/STB)</th>
-                          <th className="px-6 py-3 text-[10px] font-bold text-text-secondary uppercase tracking-widest border-b border-border-theme text-center">Bg (bbl/scf)</th>
-                          <th className="px-6 py-3 text-[10px] font-bold text-text-secondary uppercase tracking-widest border-b border-border-theme text-center">RsD (scf/STB)</th>
-                          <th className="px-6 py-3 text-[10px] font-bold text-text-secondary uppercase tracking-widest border-b border-border-theme text-center">RsDb (scf/STB)</th>
-                          <th className="px-6 py-3 text-[10px] font-bold text-text-secondary uppercase tracking-widest border-b border-border-theme text-center">BtD (bbl/STB)</th>
+                          <th className="px-6 py-3 text-[10px] font-bold text-text-secondary uppercase tracking-widest border-b border-border-theme">P (psia)</th>
+                          <th className="px-6 py-3 text-[10px] font-bold text-text-secondary uppercase tracking-widest border-b border-border-theme text-center">Bo</th>
+                          <th className="px-6 py-3 text-[10px] font-bold text-text-secondary uppercase tracking-widest border-b border-border-theme text-center">Bt</th>
+                          <th className="px-6 py-3 text-[10px] font-bold text-text-secondary uppercase tracking-widest border-b border-border-theme text-center">Bg</th>
+                          <th className="px-6 py-3 text-[10px] font-bold text-text-secondary uppercase tracking-widest border-b border-border-theme text-center">RsD</th>
+                          <th className="px-6 py-3 text-[10px] font-bold text-text-secondary uppercase tracking-widest border-b border-border-theme text-center">RsDb</th>
+                          <th className="px-6 py-3 text-[10px] font-bold text-text-secondary uppercase tracking-widest border-b border-border-theme text-center">ρo</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {dlResults.filter(r => [500, 300, 100].includes(Math.round(r.pressure))).map((row) => (
+                        {dlResults.filter(r => [500, 300, 100, Math.round(psat || 0)].includes(Math.round(r.pressure))).map((row) => (
                           <tr key={row.pressure} className="hover:bg-bg-control/30 transition-colors">
-                            <td className="px-6 py-4 text-sm font-mono text-accent-theme border-b border-border-theme">{row.pressure.toFixed(1)}</td>
+                            <td className="px-6 py-4 text-sm font-mono text-accent-theme border-b border-border-theme font-bold">{row.pressure.toFixed(2)}</td>
                             <td className="px-6 py-4 text-sm font-mono text-text-primary border-b border-border-theme text-center">{row.Bo?.toFixed(4)}</td>
+                            <td className="px-6 py-4 text-sm font-mono text-text-primary border-b border-border-theme text-center">{row.BtD?.toFixed(4)}</td>
                             <td className="px-6 py-4 text-sm font-mono text-text-primary border-b border-border-theme text-center">{row.Bg?.toFixed(6)}</td>
                             <td className="px-6 py-4 text-sm font-mono text-text-primary border-b border-border-theme text-center">{row.RsD?.toFixed(1)}</td>
-                            <td className="px-6 py-4 text-sm font-mono text-text-primary border-b border-border-theme text-center">{row.RsDb?.toFixed(1)}</td>
-                            <td className="px-6 py-4 text-sm font-mono text-text-primary border-b border-border-theme text-center">{row.BtD?.toFixed(4)}</td>
+                            <td className="px-6 py-4 text-sm font-mono text-text-primary border-b border-border-theme text-center font-bold">{row.RsDb?.toFixed(1)}</td>
+                            <td className="px-6 py-4 text-sm font-mono text-text-primary border-b border-border-theme text-center">{row.rhoO?.toFixed(2)}</td>
                           </tr>
                         ))}
                       </tbody>
                     </table>
                   </div>
                 </div>
+                </div>
 
-                <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <div className="bg-bg-surface border border-border-theme rounded-lg flex flex-col h-[400px] xl:col-span-2">
                     <div className="p-4 border-b border-border-theme flex justify-between items-center">
                       <div className="flex flex-col">
@@ -308,20 +302,17 @@ export default function App() {
                           <div className="w-2 h-2 rounded-full bg-[#10B981]" />
                           <span className="text-[10px] text-text-secondary uppercase">ρo (Oil)</span>
                         </div>
-                        <div className="flex items-center gap-1.5">
-                          <div className="w-2 h-2 rounded-full bg-[#F59E0B]" />
-                          <span className="text-[10px] text-text-secondary uppercase">ρg (Gas)</span>
-                        </div>
                       </div>
                     </div>
                     <div className="flex-1 p-4">
                       <ResponsiveContainer width="100%" height="100%">
                         <LineChart data={cceResults}>
-                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#222" />
+                          <CartesianGrid strokeDasharray="3 3" vertical stroke="#222" />
                           <XAxis 
                             dataKey="pressure" 
                             type="number" 
-                            domain={['auto', 'auto']} 
+                            domain={[700, 1600]} 
+                            ticks={[700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600]}
                             reversed
                             stroke="#444"
                             tick={{ fill: '#666', fontSize: 10 }}
@@ -345,7 +336,6 @@ export default function App() {
                           />
                           <Line yAxisId="left" name="Relative Volume" type="monotone" dataKey="relativeVolume" stroke="#00D1FF" strokeWidth={2} dot={{ r: 4 }} activeDot={{ r: 6 }} />
                           <Line yAxisId="right" name="Oil Density (ρo)" type="monotone" dataKey="rhoO" stroke="#10B981" strokeWidth={2} dot={{ r: 4 }} />
-                          <Line yAxisId="right" name="Gas Density (ρg)" type="monotone" dataKey="rhoG" stroke="#F59E0B" strokeWidth={2} dot={{ r: 4 }} connectNulls />
                         </LineChart>
                       </ResponsiveContainer>
                     </div>
@@ -359,11 +349,12 @@ export default function App() {
                     <div className="flex-1 p-4">
                       <ResponsiveContainer width="100%" height="100%">
                         <LineChart data={dlResults}>
-                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#222" />
+                          <CartesianGrid strokeDasharray="3 3" vertical stroke="#222" />
                           <XAxis 
                             dataKey="pressure" 
                             type="number" 
-                            domain={['auto', 'auto']} 
+                            domain={[0, 800]} 
+                            ticks={[0, 100, 200, 300, 400, 500, 600, 700, 800]}
                             reversed
                             stroke="#444"
                             tick={{ fill: '#666', fontSize: 10 }}
@@ -386,11 +377,12 @@ export default function App() {
                     <div className="flex-1 p-4">
                       <ResponsiveContainer width="100%" height="100%">
                         <LineChart data={dlResults}>
-                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#222" />
+                          <CartesianGrid strokeDasharray="3 3" vertical stroke="#222" />
                           <XAxis 
                             dataKey="pressure" 
                             type="number" 
-                            domain={['auto', 'auto']} 
+                            domain={[0, 800]} 
+                            ticks={[0, 100, 200, 300, 400, 500, 600, 700, 800]}
                             reversed
                             stroke="#444"
                             tick={{ fill: '#666', fontSize: 10 }}
@@ -400,7 +392,7 @@ export default function App() {
                           <Tooltip contentStyle={{ backgroundColor: '#1F2227', border: '1px solid #2D3139', borderRadius: '4px', fontSize: '11px' }} />
                           <Legend wrapperStyle={{ fontSize: '10px' }} />
                           <Line yAxisId="left" name="Solution GOR (RsD)" type="monotone" dataKey="RsD" stroke="#10B981" strokeWidth={2} dot={{ r: 4 }} />
-                          <Line yAxisId="left" name="Released Gas (RsDb)" type="monotone" dataKey="RsDb" stroke="#F59E0B" strokeWidth={2} dot={{ r: 4 }} />
+                          <Line yAxisId="left" name="Bubble Point GOR (RsDb)" type="monotone" dataKey="RsDb" stroke="#EF4444" strokeWidth={2} dot={{ r: 0 }} strokeDasharray="5 5" />
                           <Line yAxisId="right" name="Gas FVF (Bg)" type="monotone" dataKey="Bg" stroke="#8B5CF6" strokeWidth={2} dot={{ r: 4 }} />
                         </LineChart>
                       </ResponsiveContainer>
@@ -409,7 +401,7 @@ export default function App() {
                 </div>
               </div>
             ) : (
-              <div className="h-full border border-dashed border-border-theme rounded-xl flex flex-col items-center justify-center text-center p-12">
+              <div className="h-[70vh] border border-dashed border-border-theme rounded-xl flex flex-col items-center justify-center text-center p-12">
                 <Database className="w-12 h-12 text-bg-control mb-4" />
                 <h3 className="text-lg font-medium text-text-secondary">No Simulation Data</h3>
                 <p className="text-sm text-text-secondary/50 max-w-xs mt-2">
@@ -417,10 +409,11 @@ export default function App() {
                 </p>
               </div>
             )}
-          </main>
+          </div>
+        </main>
 
           {/* Results Panel */}
-          <div className="col-span-full bg-bg-surface border-t border-border-theme p-6 grid grid-cols-4 gap-8">
+          <div className="col-span-full bg-bg-surface border-t border-border-theme p-5 grid grid-cols-4 gap-8 px-8">
             <div className="flex flex-col gap-1">
               <span className="text-[10px] text-text-secondary uppercase font-bold tracking-widest">Saturation Pressure</span>
               <span className="text-3xl font-mono text-accent-theme">{psat ? psat.toFixed(2) : '--'}</span>

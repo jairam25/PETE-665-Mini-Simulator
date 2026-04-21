@@ -244,7 +244,7 @@ export class MiniSimulator {
       
       const Bo = VL_bbl / Vo_sc_bbl;
       const RsD = RsD_gas_sc / Vo_sc_bbl;
-      const RsDb = cum_released_gas_sc / Vo_sc_bbl;
+      const RsDb = total_gas_sc / Vo_sc_bbl;
       const Bg = 0.005035 * step.ZV * this.T / step.P; // bbl/scf
       
       const MWL = this.components.reduce((acc, c, j) => acc + step.xi[j] * c.MW, 0);
@@ -267,7 +267,7 @@ export class MiniSimulator {
       RsD: r.RsD,
       RsDb: r.RsDb,
       Bg: r.Bg,
-      BtD: r.Bo + r.Bg * r.RsDb,
+      BtD: r.Bo + r.Bg * (r.RsDb - r.RsD),
       rhoO: r.rhoO
     }));
   }
